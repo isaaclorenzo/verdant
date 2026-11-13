@@ -102,7 +102,6 @@
 .lib-startcard, .lib-card {
   --lift: 0px;
   transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--lift));
-  transform-style: preserve-3d;
   transition: transform 0.45s var(--ease-out), border-color 0.3s var(--ease-out), box-shadow 0.4s var(--ease-out);
   animation: fx-rise 0.55s var(--ease-out) backwards;
 }
@@ -127,9 +126,9 @@
   position: relative; display: grid; place-items: center; width: 46px; height: 46px; margin-bottom: 12px; border-radius: 15px;
   background: linear-gradient(150deg, rgba(61, 220, 151, 0.3), rgba(19, 94, 116, 0.35)); color: var(--accent-3);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 8px 20px -10px var(--accent-glow);
-  transform: translateZ(30px); transition: transform 0.5s var(--ease-spring), box-shadow 0.4s;
+  transition: transform 0.5s var(--ease-spring), box-shadow 0.4s;
 }
-.lib-startcard:hover:not(:disabled) .lib-startcard-ico { transform: translateZ(40px) scale(1.1) rotate(-6deg); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 12px 28px -8px var(--accent-glow); }
+.lib-startcard:hover:not(:disabled) .lib-startcard-ico { transform: scale(1.12) rotate(-6deg); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 12px 28px -8px var(--accent-glow); }
 .lib-startcard strong { font-size: 14px; }
 .lib-startcard small { color: var(--text-2); font-size: 12px; line-height: 1.4; }
 
@@ -153,7 +152,11 @@
 .lib-card-meta small { color: var(--text-2); font-size: 12px; }
 .lib-card-menu { position: absolute; right: 10px; bottom: 10px; opacity: 0; background: var(--glass-strong); transform: scale(0.8); transition: opacity 0.2s, transform 0.35s var(--ease-spring), background 0.2s; }
 .lib-card:hover .lib-card-menu, .lib-card-menu:focus-visible, .lib-card-menu[aria-expanded='true'] { opacity: 1; transform: none; }
-@media (hover: none) { .lib-card-menu, .lib-folder-menu { opacity: 1; transform: none; } }
+@media (hover: none) {
+  .lib-card-menu, .lib-folder-menu { opacity: 1; transform: none; }
+  /* En táctil, sin transformaciones en las tarjetas: Safari puede dejar de pintar cristal desenfocado transformado. */
+  .lib-startcard, .lib-card { transform: none; }
+}
 .lib-star { position: absolute; left: 20px; top: 20px; display: grid; place-items: center; width: 26px; height: 26px; border: 0; border-radius: 50%; background: var(--glass-strong); color: var(--warn); box-shadow: 0 0 14px -4px rgba(242, 184, 75, 0.6); }
 .lib-star-inline { color: var(--warn); flex: none; }
 
