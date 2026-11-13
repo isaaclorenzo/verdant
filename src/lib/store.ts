@@ -13,7 +13,6 @@ export interface DocSettings {
   lineHeight?: number
   /** Separación entre párrafos en pt; sin valor, la de Verdant (0,7 em). */
   paragraphGap?: number
-  pageMode?: 'pageless' | 'paged'
   paper?: 'a4' | 'letter'
   /** Color de la hoja: oscura (Verdant) o papel (como en Word). */
   sheet?: 'dark' | 'paper'

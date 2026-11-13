@@ -932,7 +932,7 @@ export async function docxToContent(buffer: ArrayBuffer): Promise<DocxResult> {
 
   const blocks = await converter.body(body)
   if (!blocks.length) blocks.push({ type: 'paragraph' })
-  const settings: Partial<DocSettings> = { ...extractDefaults(blocks), pageMode: 'paged' }
+  const settings: Partial<DocSettings> = extractDefaults(blocks)
 
   const sect = kids(body, 'sectPr').pop() ?? null
   if (sect) {

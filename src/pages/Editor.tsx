@@ -176,10 +176,9 @@ function Workspace({ live, user }: { live: Live; user: User }) {
   const [canvasWidth, setCanvasWidth] = useState(0)
   const canvasRef = useRef<HTMLElement | null>(null)
   const box = pageBox(doc.settings)
-  // En cualquier pantalla: si la hoja no cabe a lo ancho se reduce (ver `scale`), como en Word.
-  const pagedView = doc.settings.pageMode === 'paged'
+  // Siempre con páginas, en cualquier pantalla: si la hoja no cabe a lo ancho se reduce (ver `scale`), como en Word.
   const geometry = useRef<PageGeometry | null>(null)
-  geometry.current = pagedView ? { height: box.h, marginTop: box.top, marginBottom: box.bottom, gap: PAGE_GAP } : null
+  geometry.current = { height: box.h, marginTop: box.top, marginBottom: box.bottom, gap: PAGE_GAP }
 
   const caretUser = useMemo(() => ({ name: user.name, color: avatarColor(`${user.id}:${live.ydoc.clientID}`) }), [user, live])
   const editor = useEditor({
@@ -425,11 +424,10 @@ function Workspace({ live, user }: { live: Live; user: User }) {
     error: (msg: string) => toast(msg, { error: true }),
   }
 
-  const paged = pagedView
   // Si la hoja no cabe a lo ancho, se reduce (como el zoom de Word) sin alterar la medición.
   // En el teléfono se deja un margen mínimo para que la hoja aproveche todo el ancho.
   const sideRoom = canvasWidth < 600 ? 8 : 24
-  const scale = paged && canvasWidth ? Math.min(1, (canvasWidth - sideRoom) / box.w) : 1
+  const scale = canvasWidth ? Math.min(1, (canvasWidth - sideRoom) / box.w) : 1
   const pagesHeight = pages * (box.h + PAGE_GAP) - PAGE_GAP
 
   return (
@@ -528,39 +526,33 @@ function Workspace({ live, user }: { live: Live; user: User }) {
 
         <main ref={canvasRef} className="ed-canvas" onMouseDown={(e) => e.target === e.currentTarget && editor.commands.focus('end')}>
           {finding && <FindReplace editor={editor} readOnly={mode === 'view'} onClose={() => setFinding(false)} />}
-          <div className="sheet-scaler" style={paged ? { width: box.w * scale, height: pagesHeight * scale } : undefined}>
+          <div className="sheet-scaler" style={{ width: box.w * scale, height: pagesHeight * scale }}>
             <article
-              className={`sheet${paged ? ' is-paged' : ''}${settings.sheet === 'paper' ? ' is-paper' : ''}${settings.layout === 'word' ? ' is-word' : ''}`}
-              style={
-                paged
-                  ? {
-                      ...sheetVars(settings, docFont),
-                      width: box.w,
-                      minHeight: pagesHeight,
-                      padding: `${box.top}px ${box.right}px 0 ${box.left}px`,
-                      transform: scale < 1 ? `scale(${scale})` : undefined,
-                    }
-                  : sheetVars(settings, docFont)
-              }
+              className={`sheet is-paged${settings.sheet === 'paper' ? ' is-paper' : ''}${settings.layout === 'word' ? ' is-word' : ''}`}
+              style={{
+                ...sheetVars(settings, docFont),
+                width: box.w,
+                minHeight: pagesHeight,
+                padding: `${box.top}px ${box.right}px 0 ${box.left}px`,
+                transform: scale < 1 ? `scale(${scale})` : undefined,
+              }}
             >
-              {paged && (
-                <div className="page-layer" aria-hidden="true">
-                  {Array.from({ length: pages }, (_, i) => (
-                    <div key={i} className="page" style={{ top: i * (box.h + PAGE_GAP), height: box.h }}>
-                      {settings.header?.text && (
-                        <div className="page-hf" style={{ top: box.header, left: box.left, right: box.right, textAlign: settings.header.align ?? 'left' }}>
-                          {fillPageTokens(settings.header.text, i + 1, pages)}
-                        </div>
-                      )}
-                      {settings.footer?.text && (
-                        <div className="page-hf" style={{ bottom: box.footer, left: box.left, right: box.right, textAlign: settings.footer.align ?? 'center' }}>
-                          {fillPageTokens(settings.footer.text, i + 1, pages)}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
+              <div className="page-layer" aria-hidden="true">
+                {Array.from({ length: pages }, (_, i) => (
+                  <div key={i} className="page" style={{ top: i * (box.h + PAGE_GAP), height: box.h }}>
+                    {settings.header?.text && (
+                      <div className="page-hf" style={{ top: box.header, left: box.left, right: box.right, textAlign: settings.header.align ?? 'left' }}>
+                        {fillPageTokens(settings.header.text, i + 1, pages)}
+                      </div>
+                    )}
+                    {settings.footer?.text && (
+                      <div className="page-hf" style={{ bottom: box.footer, left: box.left, right: box.right, textAlign: settings.footer.align ?? 'center' }}>
+                        {fillPageTokens(settings.footer.text, i + 1, pages)}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
               <EditorContent editor={editor} />
             </article>
           </div>
@@ -770,11 +762,6 @@ function PageDialog(p: { open: boolean; settings: DocSettings; onClose: () => vo
   return (
     <Modal open={p.open} onClose={p.onClose} title="Configurar página" width={560}>
       <div className="form-grid">
-        <span>Diseño</span>
-        <div className="seg">
-          <button className={s.pageMode !== 'paged' ? 'is-on' : ''} onClick={() => setS({ ...s, pageMode: 'pageless' })}>Sin páginas</button>
-          <button className={s.pageMode === 'paged' ? 'is-on' : ''} onClick={() => setS({ ...s, pageMode: 'paged' })}>Con páginas</button>
-        </div>
         <span>Tamaño</span>
         <div className="seg">
           <button className={Math.abs(page.width - PAPER.a4.width) < 2 ? 'is-on' : ''} onClick={() => setPaper('a4')}>A4</button>

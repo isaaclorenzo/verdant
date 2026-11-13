@@ -80,8 +80,6 @@ export default function Outline({ editor, doc, storage }: { editor: Editor; doc:
           <dd>{state.chars.toLocaleString('es')}</dd>
           <dt>Fuente</dt>
           <dd>{fontLabel(doc.settings.font)}</dd>
-          <dt>Diseño</dt>
-          <dd>{doc.settings.pageMode === 'paged' ? 'Con páginas' : 'Sin páginas'}</dd>
           <dt>Creado</dt>
           <dd>{new Date(doc.created_at).toLocaleDateString('es', { dateStyle: 'medium' })}</dd>
           <dt>Modificado</dt>
