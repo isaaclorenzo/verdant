@@ -176,7 +176,8 @@ function Workspace({ live, user }: { live: Live; user: User }) {
   const [canvasWidth, setCanvasWidth] = useState(0)
   const canvasRef = useRef<HTMLElement | null>(null)
   const box = pageBox(doc.settings)
-  const pagedView = doc.settings.pageMode === 'paged' && innerWidth >= 760
+  // En cualquier pantalla: si la hoja no cabe a lo ancho se reduce (ver `scale`), como en Word.
+  const pagedView = doc.settings.pageMode === 'paged'
   const geometry = useRef<PageGeometry | null>(null)
   geometry.current = pagedView ? { height: box.h, marginTop: box.top, marginBottom: box.bottom, gap: PAGE_GAP } : null
 
@@ -426,7 +427,9 @@ function Workspace({ live, user }: { live: Live; user: User }) {
 
   const paged = pagedView
   // Si la hoja no cabe a lo ancho, se reduce (como el zoom de Word) sin alterar la medición.
-  const scale = paged && canvasWidth ? Math.min(1, (canvasWidth - 24) / box.w) : 1
+  // En el teléfono se deja un margen mínimo para que la hoja aproveche todo el ancho.
+  const sideRoom = canvasWidth < 600 ? 8 : 24
+  const scale = paged && canvasWidth ? Math.min(1, (canvasWidth - sideRoom) / box.w) : 1
   const pagesHeight = pages * (box.h + PAGE_GAP) - PAGE_GAP
 
   return (
