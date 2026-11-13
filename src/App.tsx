@@ -24,7 +24,12 @@ export default function App() {
   return (
     <ToastProvider>
       <div className="vd-backdrop" aria-hidden="true">
-        <span />
+        <span className="vd-orb vd-orb-a" />
+        <span className="vd-orb vd-orb-b" />
+        <span className="vd-orb vd-orb-c" />
+        <span className="vd-mesh" />
+        <span className="vd-glow" />
+        <span className="vd-grain" />
       </div>
       {session === undefined ? (
         <div className="center-screen">
