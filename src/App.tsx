@@ -28,7 +28,6 @@ export default function App() {
         <span className="vd-orb vd-orb-b" />
         <span className="vd-orb vd-orb-c" />
         <span className="vd-mesh" />
-        <span className="vd-glow" />
         <span className="vd-grain" />
       </div>
       {session === undefined ? (

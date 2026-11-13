@@ -9,10 +9,10 @@
   background: linear-gradient(165deg, rgba(22, 33, 28, 0.78), rgba(9, 15, 12, 0.7) 60%, rgba(14, 24, 20, 0.74));
 }
 .lib-brand { display: flex; align-items: center; gap: 11px; padding: 0 6px; font-size: 19px; font-weight: 800; letter-spacing: -0.02em; }
-.lib-brand .lib-logo { animation: fx-breathe 4.5s ease-in-out infinite; }
+.lib-brand .lib-logo { animation: fx-breathe 1.6s ease-in-out 2; filter: drop-shadow(0 0 6px rgba(61, 220, 151, 0.35)); }
 .lib-brand > span, .lib-brand > strong {
   background: linear-gradient(100deg, var(--text) 30%, var(--accent-3) 50%, var(--text) 70%) 0 0 / 250% 100%;
-  -webkit-background-clip: text; background-clip: text; color: transparent; animation: fx-shine 7s ease-in-out infinite;
+  -webkit-background-clip: text; background-clip: text; color: transparent; animation: fx-shine 2.2s 0.4s ease-out both;
 }
 .lib-close { display: none; margin-left: auto; }
 .lib-new { justify-content: center; height: 42px; font-size: 13.5px; }
@@ -74,7 +74,6 @@
 .lib-search {
   position: relative; flex: 1; max-width: 660px; display: flex; align-items: center; gap: 10px; height: 50px; padding: 0 8px 0 18px;
   border-radius: 999px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.035)); border: 1px solid var(--line-2); color: var(--text-2);
-  -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.07) inset, 0 14px 30px -20px rgba(0, 0, 0, 0.9);
   transition: border-color 0.25s var(--ease-out), box-shadow 0.35s var(--ease-out), transform 0.4s var(--ease-spring), max-width 0.5s var(--ease-out);
 }
@@ -84,7 +83,7 @@
 .lib-search input { flex: 1; min-width: 0; height: 100%; border: 0; outline: none; background: transparent; font-size: 15px; color: var(--text); }
 .lib-search input::placeholder { color: var(--text-3); }
 .lib-search kbd { padding: 3px 8px; margin-right: 8px; border-radius: 8px; border: 1px solid var(--line-2); background: rgba(0, 0, 0, 0.25); font: 700 11px var(--font-ui); color: var(--text-3); }
-.lib-seg { display: flex; margin-left: auto; padding: 4px; gap: 2px; border-radius: 999px; background: var(--glass); border: 1px solid var(--line); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); }
+.lib-seg { display: flex; margin-left: auto; padding: 4px; gap: 2px; border-radius: 999px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--line); }
 .lib-seg button { display: grid; place-items: center; width: 36px; height: 32px; border: 0; border-radius: 999px; background: transparent; color: var(--text-2); transition: background 0.25s var(--ease-out), color 0.2s, transform 0.35s var(--ease-spring); }
 .lib-seg button:hover { color: var(--text); }
 .lib-seg button:active { transform: scale(0.88); }
@@ -113,6 +112,9 @@
 .lib-start > :nth-child(6), .lib-grid > :nth-child(6) { animation-delay: 0.35s; }
 .lib-grid > :nth-child(7) { animation-delay: 0.4s; } .lib-grid > :nth-child(8) { animation-delay: 0.45s; }
 .lib-grid > :nth-child(n + 9) { animation-delay: 0.5s; }
+
+/* Las tarjetas son muchas: sin desenfoque real, con un fondo que imita el cristal. */
+.lib-startcard.glass, .lib-card.glass { -webkit-backdrop-filter: none; backdrop-filter: none; background: linear-gradient(160deg, rgba(255, 255, 255, 0.085), rgba(255, 255, 255, 0.03) 55%, rgba(255, 255, 255, 0.05)), rgba(10, 17, 14, 0.55); }
 
 /* ---------- Empezar nuevo ---------- */
 .lib-start { display: grid; grid-template-columns: repeat(auto-fill, minmax(172px, 1fr)); gap: 14px; }
@@ -161,7 +163,7 @@
 .lib-star-inline { color: var(--warn); flex: none; }
 
 /* ---------- Lista ---------- */
-.lib-table { border-radius: 22px; border: 1px solid var(--line); background: linear-gradient(160deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); overflow: hidden; animation: fx-rise 0.5s var(--ease-out) backwards; }
+.lib-table { border-radius: 22px; border: 1px solid var(--line); background: linear-gradient(160deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)); overflow: hidden; animation: fx-rise 0.5s var(--ease-out) backwards; }
 .lib-row { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 160px 170px 72px; align-items: center; gap: 12px; padding: 0 8px 0 16px; min-height: 50px; border-top: 1px solid var(--line); transition: background 0.2s var(--ease-out), padding 0.3s var(--ease-out); }
 .lib-row:first-child { border-top: 0; }
 .lib-row:not(.lib-row-head)::before { content: ''; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px; border-radius: 0 3px 3px 0; background: var(--accent); box-shadow: 0 0 12px var(--accent-glow); transform: scaleY(0); transition: transform 0.3s var(--ease-spring); }
@@ -204,7 +206,7 @@
 
 @keyframes fx-side { from { opacity: 0; transform: translateX(-24px); } }
 @keyframes fx-bar { from { transform: scaleY(0); } }
-@keyframes fx-shine { 0%, 70% { background-position: 100% 0; } 100% { background-position: -150% 0; } }
+@keyframes fx-shine { from { background-position: 100% 0; } to { background-position: -150% 0; } }
 @keyframes fx-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 @keyframes fx-glowpulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(61, 220, 151, 0); } 50% { box-shadow: 0 0 60px -10px rgba(61, 220, 151, 0.35); } }
 
@@ -244,7 +246,7 @@
 .login-card > * { animation: fx-rise 0.6s var(--ease-out) backwards; }
 .login-card > :nth-child(2) { animation-delay: 0.12s; } .login-card > :nth-child(3) { animation-delay: 0.22s; }
 .login-brand { display: grid; justify-items: center; gap: 8px; margin-bottom: 24px; text-align: center; }
-.login-brand .lib-logo { animation: fx-breathe 3.5s ease-in-out infinite, fx-float 6s ease-in-out infinite; }
+.login-brand .lib-logo { animation: fx-breathe 1.6s ease-in-out 2, fx-float 6s ease-in-out infinite; filter: drop-shadow(0 0 6px rgba(61, 220, 151, 0.35)); }
 .login-brand h1 { margin: 8px 0 0; font-size: 24px; letter-spacing: -0.02em; }
 .login-brand p { margin: 0; color: var(--text-2); font-size: 13.5px; }
 .login-tabs { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; gap: 2px; margin-bottom: 18px; border-radius: 999px; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--line); }

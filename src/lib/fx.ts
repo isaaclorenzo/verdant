@@ -1,6 +1,6 @@
 // Verdant · capa de interacción ("acción y reacción").
 // Un único juego de escuchas en el documento: ondas al pulsar, foco de luz sobre el cristal,
-// inclinación 3D de las tarjetas y la luz del fondo que sigue al cursor.
+// e inclinación 3D de las tarjetas. Las variables que escribe son no heredables (@property en base.css).
 // Solo escribe variables CSS y añade nodos efímeros; no toca el editor ni sus medidas.
 
 const RIPPLE = [
@@ -52,9 +52,6 @@ function onFrame() {
   frame = 0
   const e = last
   if (!e) return
-  const root = document.documentElement
-  root.style.setProperty('--gx', `${e.clientX}px`)
-  root.style.setProperty('--gy', `${e.clientY}px`)
   const target = e.target as Element | null
 
   const glass = target?.closest<HTMLElement>(SPOT) ?? null
