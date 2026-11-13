@@ -333,7 +333,6 @@ kbd { font-family: var(--font-ui); font-size: 11px; padding: 1px 5px; border-rad
 }
 .sheet.is-paged .vd-prose { position: relative; z-index: 1; min-height: 0; }
 .vd-prose .vd-page-gap { margin: 0 !important; pointer-events: none; }
-.vd-prose .vd-page-gap + * { margin-top: 0 !important; }
 .sheet.is-paged .vd-prose .vd-page-break { height: 0; margin: 0 !important; border: 0; }
 .sheet.is-paged .vd-prose .vd-page-break::after { display: none; }
 .sheet.is-paged .vd-prose .vd-page-break.ProseMirror-selectednode { outline: 2px solid var(--accent); outline-offset: 2px; }

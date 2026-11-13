@@ -46,27 +46,49 @@ function measure(view: EditorView, g: PageGeometry): { spacers: Spacer[]; pages:
     const r = el.getBoundingClientRect()
     return { top: (r.top - base.top) / scale, height: r.height / scale }
   }
-  // Los espaciadores ya insertados no cuentan: se calcula sobre la posición "natural" de cada bloque.
-  const gaps = Array.from(dom.querySelectorAll<HTMLElement>(':scope > .vd-page-gap')).map((el) => ({ top: rel(el).top, h: parseFloat(el.style.height) || 0 }))
-  const items: { pos: number; top: number; height: number; mt: number; isBreak: boolean }[] = []
+  // Posición "natural" de cada bloque (como si no hubiera espaciadores). Entre dos bloques seguidos
+  // se mide la distancia real; si hay un espaciador en medio, la que habría sin él (márgenes
+  // colapsados). Alturas y márgenes no cambian con los espaciadores, así que cada medición parte de
+  // los mismos datos y llega al mismo resultado: sin eso las hojas oscilaban (el texto «vibraba»).
+  interface Item { pos: number; top: number; height: number; mt: number; prevBottom: number; prevMb: number; isBreak: boolean }
+  const items: Item[] = []
+  let prev: { top: number; actualTop: number; height: number; mb: number } | null = null
   view.state.doc.forEach((node, offset) => {
     const el = view.nodeDOM(offset)
     if (!(el instanceof HTMLElement)) return
     const box = rel(el)
-    let top = box.top
-    for (const s of gaps) if (s.top < box.top - 0.1) top -= s.h
-    items.push({ pos: offset, top, height: box.height, mt: parseFloat(getComputedStyle(el).marginTop) || 0, isBreak: node.type.name === 'pageBreak' })
+    const cs = getComputedStyle(el)
+    const mt = parseFloat(cs.marginTop) || 0
+    const mb = parseFloat(cs.marginBottom) || 0
+    const gapBefore = el.previousElementSibling?.classList.contains('vd-page-gap') ?? false
+    let top: number
+    if (!prev) top = gapBefore ? box.top - (parseFloat((el.previousElementSibling as HTMLElement).style.height) || 0) : box.top
+    else if (gapBefore) top = prev.top + prev.height + Math.max(prev.mb, mt)
+    else top = prev.top + (box.top - prev.actualTop)
+    items.push({
+      pos: offset,
+      top,
+      height: box.height,
+      mt,
+      prevBottom: prev ? prev.top + prev.height : top,
+      prevMb: prev ? prev.mb : 0,
+      isBreak: node.type.name === 'pageBreak',
+    })
+    prev = { top, actualTop: box.top, height: box.height, mb }
   })
 
   const spacers: Spacer[] = []
   let S = 0
   let q = 0
   let forceNext = false
-  const moveTo = (it: (typeof items)[number], page: number) => {
-    const h = page * P + it.mt - (it.top + S)
+  // Lleva el bloque al principio de la hoja `page`. El espaciador va entre el margen inferior del
+  // bloque anterior y el superior de este (con él en medio los márgenes ya no se colapsan).
+  const moveTo = (it: Item, page: number) => {
+    const shift = page * P - (it.top + S)
+    const h = it.pos === items[0]?.pos ? shift : page * P - (it.prevBottom + S) - it.prevMb - it.mt
     if (h > 0.5) {
       spacers.push({ pos: it.pos, height: Math.round(h * 100) / 100 })
-      S += h
+      S += shift
     }
     q = page
   }
@@ -116,17 +138,25 @@ export const Pagination = Extension.create<PaginationOptions>({
           let timer: ReturnType<typeof setTimeout> | undefined
           let signature = ''
           let pages = 1
+          // Repartos ya aplicados desde el último cambio del documento, de la geometría o del ancho.
+          // Si uno vuelve a salir, se mantiene el actual: la hoja nunca se queda oscilando.
+          const seen = new Set<string>([signature])
+          let width = -1
           const run = () => {
             timer = undefined
             if (!view.dom.isConnected) return
             const g = options.geometry()
+            const w = view.dom.clientWidth
+            if (w !== width) (width = w), seen.clear()
             const result = g ? measure(view, g) : { spacers: [], pages: 1 }
+            const sig = JSON.stringify(result.spacers)
+            if (sig !== signature && seen.has(sig)) return
             if (result.pages !== pages) {
               pages = result.pages
               options.onPages(pages)
             }
-            const sig = JSON.stringify(result.spacers)
             if (sig === signature) return
+            seen.add(sig)
             signature = sig
             const decorations = DecorationSet.create(
               view.state.doc,
@@ -157,7 +187,10 @@ export const Pagination = Extension.create<PaginationOptions>({
           schedule()
           return {
             update(v, prev) {
-              if (v.state.doc !== prev.doc || paginationKey.getState(v.state)?.rev !== paginationKey.getState(prev)?.rev) schedule()
+              if (v.state.doc !== prev.doc || paginationKey.getState(v.state)?.rev !== paginationKey.getState(prev)?.rev) {
+                seen.clear()
+                schedule()
+              }
             },
             destroy() {
               clearTimeout(timer)
